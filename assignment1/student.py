@@ -6,7 +6,7 @@ def add(img, alpha):
     #Additionally clips values to between 0 and 1 (see utils.clip)
     # TODO 1a
     # TODO-BLOCK-BEGIN
-    pass
+    return utils.clip(img + alpha)
     # TODO-BLOCK-END
 
 def multiply(img, alpha):
@@ -14,7 +14,7 @@ def multiply(img, alpha):
     # additionally clips values
     # TODO 1b
     # TODO-BLOCK-BEGIN
-    pass
+    return utils.clip(img * alpha)
     # TODO-BLOCK-END
 
 def normalize(img):
@@ -28,7 +28,8 @@ def normalize(img):
     # then return an image that is 0 everywhere
     # TODO 1c
     # TODO-BLOCK-BEGIN
-    pass
+    temp_img = img-np.min
+    return  temp_img / np.max(temp_img )
     # TODO-BLOCK-END
 def threshold(img, thresh):
     # Produces an image where pixels greater than thresh are assigned 1 and
@@ -36,7 +37,7 @@ def threshold(img, thresh):
     # Make sure to return a float image
     # TODO 1d
     # TODO-BLOCK-BEGIN
-    pass
+    return np.array(img>thresh,dtype='int')
     # TODO-BLOCK-END
 
 
@@ -97,3 +98,10 @@ def gradient_magnitude(img, k=3,sigma=0):
     # TODO-BLOCK-BEGIN
     pass
     # TODO-BLOCK-END
+
+if __name__ == "__main__":
+    N = 10
+    rand_img = np.random.random((N,N))
+    new_img = threshold(rand_img,0.5)
+    print(rand_img,"\n",new_img)
+    a = 2
