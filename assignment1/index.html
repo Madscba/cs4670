@@ -1,0 +1,57 @@
+<html>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" />
+<head><title>Instructions for  PA1</title></head>
+<body style="margin: 2rem; font-size: 15px">
+  <h1>Programming Assignment 1: Basic Image Processing </h1>
+  <p> In this assignment, we will build some basic image processing tools. In particular,
+    you will add code to student.py to do the following:</p>
+<h2>Todos</h2>
+<ol>
+  <li>Basic appearance manipulations
+    <ol type="a">
+      <li> <i>Brightness</i> : Add a constant value to the image, then clip to allowable range (0,1)</li>
+      <li><i>Contrast</i> : Multiply intensity by a constant value, then clip to allowable range (0,1)</li>
+      <li><i>Normalize</i> : Make brightness and contrast changes so that the minimum intensity of the image is
+        transformed to 0 and the maximum intensity is transformed to 1 </li>
+        <li><i>Threshold</i> the image </li>
+    </ol>
+  </li>
+  <li> Implement "same" convolution of an image with a filter.</li>
+  <li> Produce blurring filters:
+    <ol type="a">
+      <li> A mean filter</li>
+      <li> A Gaussian filter</li>
+      </ol>
+    </li>
+  <li> Perform edge detection:
+    <ol type="a">
+      <li> Produce a filter computing X derivatives (w/o blurring)</li>
+      <li> Produce a filter computing Y derivatives (w/o blurring)</li>
+      <li> Compute the gradient magnitude by combining X and Y derivatives and optional blurring</li>
+    </ol>
+  </li>
+
+</ol>
+<p> Once you are done, running demo.ipynb should produce the output shown in demo.html</p>
+
+<h2>Installation instructions</h2>
+For this assignment, you will need to install a number of tools including Anaconda, python3, and Jupyter.
+<h3> Anaconda installation </h3> 
+Anaconda will come with an installation of Python and many important packages that we will use in this class. <br />
+You may install Anaconda at the following links: 
+<ul> 
+  <li> <a href="https://docs.anaconda.com/anaconda/install/mac-os/"> macOS </a> </li> 
+  <li> <a href="https://docs.anaconda.com/anaconda/install/windows/"> Windows </a> </li>
+  <li> <a href="https://docs.anaconda.com/anaconda/install/linux/"> Linux </a></li> 
+</ul>
+
+Be sure to install a version of Anaconda that supports python3. <br />
+
+<h3> Jupyter installation </h3> 
+Now that you have <code>conda</code>, installation of Jupyter is fairly simple. <br />
+You will need Jupyter notebook, which you can install using <code style="background-color:#ddd">conda install -c conda-forge notebook</code>. <br />
+After installing, you can navigate to the directory in which the notebook is contained, and run the command 
+<code style="background-color:#ddd">jupyter notebook</code>.
+
+<h2> Rules of the game </h2>
+Only modify blocks of code within TODO-begin and TODO-end. Submit student.py. No additional imports allowed.
