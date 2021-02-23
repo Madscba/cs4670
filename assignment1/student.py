@@ -65,6 +65,9 @@ def mean_filter(k):
     pass
     # TODO-BLOCK-END
 
+def gauss(x,center_x,y,center_y,sigma):
+
+    return constant * np.exp(- ( ((x-center_x)**2 + (y-center_y)**2) / (2*sigma**2) ) )
 
 def gaussian_filter(k, sigma):
     # Produces a k x k gaussian filter with standard deviation sigma
@@ -74,6 +77,13 @@ def gaussian_filter(k, sigma):
     # TODO 3b
     # TODO-BLOCK-BEGIN
     pass
+    x = [np.linspace(- (k//2) ,k//2, num=k)]
+    dist_matrix = np.vstack(x*5)**2 + np.vstack(x*5).T**2
+    gauss_constant = 1 / (2 * np.pi * sigma ** 2)
+    dist_matrix= gauss_constant * np.exp(- ( ( dist_matrix/ (2*sigma**2) ) ) )
+    return dist_matrix
+
+
     # TODO-BLOCK-END
 
 def dx_filter():
@@ -88,6 +98,7 @@ def dy_filter():
     # TODO 4b
     # TODO-BLOCK-BEGIN
     pass
+    
     # TODO-BLOCK-END
 
 def gradient_magnitude(img, k=3,sigma=0):
@@ -100,8 +111,9 @@ def gradient_magnitude(img, k=3,sigma=0):
     # TODO-BLOCK-END
 
 if __name__ == "__main__":
-    N = 10
-    rand_img = np.random.random((N,N))
-    new_img = threshold(rand_img,0.5)
-    print(rand_img,"\n",new_img)
-    a = 2
+    print(gaussian_filter(5,1))
+    # N = 10
+    # rand_img = np.random.random((N,N))
+    # new_img = threshold(rand_img,0.5)
+    # print(rand_img,"\n",new_img)
+    # a = 2
