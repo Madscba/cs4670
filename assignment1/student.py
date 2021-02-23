@@ -1,6 +1,7 @@
 import numpy as np
 import utils
 import matplotlib.pyplot as plt
+
 def add(img, alpha):
     #adds alpha to all pixels of an image.
     #Additionally clips values to between 0 and 1 (see utils.clip)
@@ -53,7 +54,18 @@ def convolve(img, filt):
 
     # TODO 2
     # TODO-BLOCK-BEGIN
-    pass
+
+    filt = np.flip(filt)
+    row,column = np.shape(filt)
+    row_pad, column_pad = row//2, column//2
+    pad_img = np.pad(img,pad_width=((row_pad,row_pad),(column_pad,column_pad)),mode='constant',constant_values=( (0,0),(0,0)))
+    out = np.zeros_like(img)
+    img_row,img_column = np.shape(img)
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            out[i,j] = np.sum( pad_img[i:i+row,j:j+column] * filt )
+
+    return out
     # TODO-BLOCK-END
 
 def mean_filter(k):
@@ -65,10 +77,6 @@ def mean_filter(k):
     pass
     # TODO-BLOCK-END
 
-def gauss(x,center_x,y,center_y,sigma):
-
-    return constant * np.exp(- ( ((x-center_x)**2 + (y-center_y)**2) / (2*sigma**2) ) )
-
 def gaussian_filter(k, sigma):
     # Produces a k x k gaussian filter with standard deviation sigma
     # Assume k is odd
@@ -76,11 +84,12 @@ def gaussian_filter(k, sigma):
 
     # TODO 3b
     # TODO-BLOCK-BEGIN
-    pass
+
     x = [np.linspace(- (k//2) ,k//2, num=k)]
-    dist_matrix = np.vstack(x*5)**2 + np.vstack(x*5).T**2
-    gauss_constant = 1 / (2 * np.pi * sigma ** 2)
-    dist_matrix= gauss_constant * np.exp(- ( ( dist_matrix/ (2*sigma**2) ) ) )
+    dist_matrix = np.vstack(x*k)**2 + np.vstack(x*k).T**2
+    #gauss_constant = 1 / (2 * np.pi * sigma ** 2)
+    dist_matrix= np.exp(- ( ( dist_matrix/ (2*sigma**2) ) ) )
+    dist_matrix /= np.sum(dist_matrix)
     return dist_matrix
 
 
@@ -90,15 +99,15 @@ def dx_filter():
     # Produces a 1 x 3 filter that computes the derivative in x direction
     # TODO 4a
     # TODO-BLOCK-BEGIN
-    pass
+    return np.array([1,-1,0]).reshape(1,-1)
     # TODO-BLOCK-END
 
 def dy_filter():
     # Produces a 3 x 1 filter that computes the derivative in y direction
     # TODO 4b
     # TODO-BLOCK-BEGIN
-    pass
-    
+    return np.array([1,-1,0]).reshape(-1,1)
+
     # TODO-BLOCK-END
 
 def gradient_magnitude(img, k=3,sigma=0):
@@ -107,12 +116,27 @@ def gradient_magnitude(img, k=3,sigma=0):
     # image with a gaussian first
     # TODO 4c
     # TODO-BLOCK-BEGIN
-    pass
+    if sigma > 0:
+        img = convolve(img,gaussian_filter(k,sigma))
+
+    gradient_magnitude = np.sqrt ( convolve(img,dx_filter())**2 + convolve(img, dy_filter())**2)
+    return gradient_magnitude
+
+
+
+
+
+
+
     # TODO-BLOCK-END
 
 if __name__ == "__main__":
-    print(gaussian_filter(5,1))
-    # N = 10
+
+    print(np.dot(dx_filter().T,dy_filter()))
+    #g = gaussian_filter(5,1)
+    #print(np.sum(g))
+    #print(convolve(g,np.array([[0,0,0],[0,1,0],[0,0,0]])))
+        # N = 10
     # rand_img = np.random.random((N,N))
     # new_img = threshold(rand_img,0.5)
     # print(rand_img,"\n",new_img)
