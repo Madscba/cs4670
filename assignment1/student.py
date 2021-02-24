@@ -2,13 +2,15 @@ import numpy as np
 import utils
 import matplotlib.pyplot as plt
 
+
 def add(img, alpha):
-    #adds alpha to all pixels of an image.
-    #Additionally clips values to between 0 and 1 (see utils.clip)
+    # adds alpha to all pixels of an image.
+    # additionally clips values to between 0 and 1 (see utils.clip)
     # TODO 1a
     # TODO-BLOCK-BEGIN
     return utils.clip(img + alpha)
     # TODO-BLOCK-END
+
 
 def multiply(img, alpha):
     # multiplies all pixel intensities by alpha
@@ -17,6 +19,7 @@ def multiply(img, alpha):
     # TODO-BLOCK-BEGIN
     return utils.clip(img * alpha)
     # TODO-BLOCK-END
+
 
 def normalize(img):
     # Performs an affine transformation of the intensities
@@ -29,16 +32,17 @@ def normalize(img):
     # then return an image that is 0 everywhere
     # TODO 1c
     # TODO-BLOCK-BEGIN
-    temp_img = img-np.min
-    return  temp_img / np.max(temp_img )
+    return (img - np.min(img)) / np.ptp(img)
     # TODO-BLOCK-END
+
+
 def threshold(img, thresh):
     # Produces an image where pixels greater than thresh are assigned 1 and
     # those less than thresh are assigned 0
     # Make sure to return a float image
     # TODO 1d
     # TODO-BLOCK-BEGIN
-    return np.array(img>thresh,dtype='int')
+    return np.array(img > thresh, dtype='float')
     # TODO-BLOCK-END
 
 
@@ -68,14 +72,16 @@ def convolve(img, filt):
     return out
     # TODO-BLOCK-END
 
+
 def mean_filter(k):
     # Produces a k x k mean filter
     # Assume k is odd
     assert k%2!=0, "Kernel size must be odd"
     # TODO 3a
     # TODO-BLOCK-BEGIN
-    pass
+    return np.ones((k, k)) / (k**2)
     # TODO-BLOCK-END
+
 
 def gaussian_filter(k, sigma):
     # Produces a k x k gaussian filter with standard deviation sigma
@@ -84,16 +90,13 @@ def gaussian_filter(k, sigma):
 
     # TODO 3b
     # TODO-BLOCK-BEGIN
-
-    x = [np.linspace(- (k//2) ,k//2, num=k)]
+    x = [np.linspace(- (k//2), k//2, num=k)]
     dist_matrix = np.vstack(x*k)**2 + np.vstack(x*k).T**2
-    #gauss_constant = 1 / (2 * np.pi * sigma ** 2)
-    dist_matrix= np.exp(- ( ( dist_matrix/ (2*sigma**2) ) ) )
+    dist_matrix= np.exp(-(dist_matrix / (2*sigma**2)))
     dist_matrix /= np.sum(dist_matrix)
     return dist_matrix
-
-
     # TODO-BLOCK-END
+
 
 def dx_filter():
     # Produces a 1 x 3 filter that computes the derivative in x direction
@@ -102,13 +105,14 @@ def dx_filter():
     return np.array([1,-1,0]).reshape(1,-1)
     # TODO-BLOCK-END
 
+
 def dy_filter():
     # Produces a 3 x 1 filter that computes the derivative in y direction
     # TODO 4b
     # TODO-BLOCK-BEGIN
     return np.array([1,-1,0]).reshape(-1,1)
-
     # TODO-BLOCK-END
+
 
 def gradient_magnitude(img, k=3,sigma=0):
     # Compute the gradient magnitude at each pixel,,
@@ -121,23 +125,16 @@ def gradient_magnitude(img, k=3,sigma=0):
 
     gradient_magnitude = np.sqrt ( convolve(img,dx_filter())**2 + convolve(img, dy_filter())**2)
     return gradient_magnitude
-
-
-
-
-
-
-
     # TODO-BLOCK-END
 
-if __name__ == "__main__":
 
-    print(np.dot(dx_filter().T,dy_filter()))
-    #g = gaussian_filter(5,1)
-    #print(np.sum(g))
-    #print(convolve(g,np.array([[0,0,0],[0,1,0],[0,0,0]])))
-        # N = 10
-    # rand_img = np.random.random((N,N))
-    # new_img = threshold(rand_img,0.5)
-    # print(rand_img,"\n",new_img)
-    # a = 2
+if __name__ == "__main__":
+    # print(np.dot(dx_filter().T,dy_filter()))
+    # g = gaussian_filter(5,1)
+    # print(np.sum(g))
+    # print(convolve(g,np.array([[0,0,0],[0,1,0],[0,0,0]])))
+    N = 10
+    rand_img = np.random.random((N,N))
+    new_img = threshold(rand_img,0.5)
+    print(rand_img,"\n",new_img)
+    a = 2
