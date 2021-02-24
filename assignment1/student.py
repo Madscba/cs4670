@@ -102,7 +102,7 @@ def dx_filter():
     # Produces a 1 x 3 filter that computes the derivative in x direction
     # TODO 4a
     # TODO-BLOCK-BEGIN
-    return np.array([1,-1,0]).reshape(1,-1)
+    return np.array([1,0,-1]).reshape(1,-1)
     # TODO-BLOCK-END
 
 
@@ -110,7 +110,7 @@ def dy_filter():
     # Produces a 3 x 1 filter that computes the derivative in y direction
     # TODO 4b
     # TODO-BLOCK-BEGIN
-    return np.array([1,-1,0]).reshape(-1,1)
+    return np.array([1,0, -1]).reshape(-1,1)
     # TODO-BLOCK-END
 
 
