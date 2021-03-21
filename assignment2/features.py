@@ -271,12 +271,14 @@ class MOPSFeatureDescriptor(FeatureDescriptor):
             # helper functions that might be useful
             # Note: use grayImage to compute features on, not the input image
             # TODO-BLOCK-BEGIN
-            T1 = transformations.get_trans_mx(np.array([f.pt[0], f.pt[1], 0]))
+            T1 = transformations.get_trans_mx(np.array([-f.pt[0], -f.pt[1], 0]))
             R = transformations.get_rot_mx(0, 0, -f.angle)
             S = transformations.get_scale_mx(1/5, 1/5, 1)
-            T2 = transformations.get_trans_mx(np.array([3, 3, 0]))
+            T2 = transformations.get_trans_mx(np.array([4, 4, 0]))
 
             transMx = T2 @ S @ R @ T1
+            transMx = np.delete(transMx, [2, 3], axis=0)
+            transMx = np.delete(transMx, 2, axis=1)
             # TODO-BLOCK-END
 
             # Call the warp affine function to do the mapping
@@ -289,7 +291,12 @@ class MOPSFeatureDescriptor(FeatureDescriptor):
             # define as less than 1e-10) then set the descriptor
             # vector to zero. Lastly, write the vector to desc.
             # TODO-BLOCK-BEGIN
-            raise Exception("TODO in features.py not implemented")
+            if np.var(destImage) < 1e-10:
+                desc[i] = np.zeros(windowSize * windowSize)
+            else:
+                destImage -= np.mean(destImage)
+                destImage /= np.std(destImage)
+                desc[i] = destImage.flatten()
             # TODO-BLOCK-END
 
         return desc
