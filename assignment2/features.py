@@ -272,7 +272,7 @@ class MOPSFeatureDescriptor(FeatureDescriptor):
             # Note: use grayImage to compute features on, not the input image
             # TODO-BLOCK-BEGIN
             T1 = transformations.get_trans_mx(np.array([-f.pt[0], -f.pt[1], 0]))
-            R = transformations.get_rot_mx(0, 0, -f.angle)
+            R = transformations.get_rot_mx(0, 0, np.radians(-f.angle))
             S = transformations.get_scale_mx(1/5, 1/5, 1)
             T2 = transformations.get_trans_mx(np.array([4, 4, 0]))
 
