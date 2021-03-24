@@ -431,7 +431,14 @@ class RatioFeatureMatcher(FeatureMatcher):
         # Note: multiple features from the first image may match the same
         # feature in the second image.
         # TODO-BLOCK-BEGIN
-        raise Exception("TODO in features.py not implemented")
+        dists = scipy.spatial.distance.cdist(desc1, desc2) ** 2
+        closest2 = np.argsort(dists, axis=1)[:, :2]
+        first_match_dist = dists[range(np.shape(dists)[0]), closest2[:, 0]]
+        second_match_dist = dists[range(np.shape(dists)[0]), closest2[:, 1]]
+        ratio = first_match_dist / second_match_dist
+
+        for i in range(len(desc1)):
+            matches.append(cv2.DMatch(i, closest2[i, 0], ratio[i]))
         # TODO-BLOCK-END
 
         return matches
