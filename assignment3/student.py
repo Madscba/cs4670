@@ -279,4 +279,8 @@ def compute_ncc_impl(image1, image2):
         ncc -- height x width normalized cross correlation between image1 and
                image2.
     """
-    raise NotImplementedError()
+    ncc = np.zeros((image1.shape[0], image1.shape[1]))
+    for i in range(image1.shape[0]):
+        for j in range(image1.shape[1]):
+            ncc[i, j] = np.dot(image1[i,j], image2[i,j])
+    return ncc
