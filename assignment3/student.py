@@ -253,23 +253,25 @@ def preprocess_ncc_impl(image, ncc_size):
     """
     normalized = np.zeros((image.shape[0], image.shape[1], image.shape[2]*ncc_size**2))
     pad = ncc_size // 2
-    padded_image = np.pad(image,
-                          pad_width=((pad, pad), (pad, pad), (0, 0)), mode="constant",
-                          constant_values=((0, 0), (0, 0), (0, 0)))
+    # padded_image = np.pad(image,
+    #                       pad_width=((pad, pad), (pad, pad), (0, 0)), mode="constant",
+    #                       constant_values=((0, 0), (0, 0), (0, 0)))
     count = 0
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
-            patch = padded_image[i:i+ncc_size, j:j+ncc_size]
-            #patch -= np.expand_dims(np.mean(patch, axis=(0, 1)), axis=(0, 1))
-            flat_patch = np.zeros(image.shape[2]*ncc_size**2)
-            flat_patch[:ncc_size**2] = np.ndarray.flatten(patch[:, :, 0]) - np.mean(np.ndarray.flatten(patch[:, :, 0]))
-            flat_patch[ncc_size**2:2*ncc_size**2] = np.ndarray.flatten(patch[:, :, 1]) - np.mean(np.ndarray.flatten(patch[:, :, 1]))
-            flat_patch[2*ncc_size**2:3*ncc_size**2] = np.ndarray.flatten(patch[:, :, 2]) - np.mean(np.ndarray.flatten(patch[:, :, 2]))
-            n = np.linalg.norm(flat_patch)
-            if n < 1e-6:
+            if i < pad or j < pad or i > image.shape[0]-(pad+1) or j > image.shape[1]-(pad+1):
                 normalized[i, j] = np.zeros(image.shape[2]*ncc_size**2)
             else:
-                normalized[i, j] = flat_patch / n
+                patch = image[i-pad:i+pad+1, j-pad:j+pad+1]
+                flat_patch = np.zeros(image.shape[2]*ncc_size**2)
+                flat_patch[:ncc_size**2] = np.ndarray.flatten(patch[:, :, 0]) - np.mean(np.ndarray.flatten(patch[:, :, 0]))
+                flat_patch[ncc_size**2:2*ncc_size**2] = np.ndarray.flatten(patch[:, :, 1]) - np.mean(np.ndarray.flatten(patch[:, :, 1]))
+                flat_patch[2*ncc_size**2:3*ncc_size**2] = np.ndarray.flatten(patch[:, :, 2]) - np.mean(np.ndarray.flatten(patch[:, :, 2]))
+                n = np.linalg.norm(flat_patch)
+                if n < 1e-6:
+                    normalized[i, j] = np.zeros(image.shape[2]*ncc_size**2)
+                else:
+                    normalized[i, j] = flat_patch / n
     return normalized
 
 
@@ -288,5 +290,5 @@ def compute_ncc_impl(image1, image2):
     ncc = np.zeros((image1.shape[0], image1.shape[1]))
     for i in range(image1.shape[0]):
         for j in range(image1.shape[1]):
-            ncc[i, j] = np.dot(image1[i,j], image2[i,j])
+            ncc[i, j] = image1[i,j].T @ image2[i,j]
     return ncc
