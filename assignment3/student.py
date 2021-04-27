@@ -191,17 +191,10 @@ def unproject_corners_impl(K, width, height, depth, Rt):
     corner_pts = np.array([[[0, 0, 1], [width, 0, 1]], [[0, height, 1], [width, height, 1]]])
     corner_pts = np.transpose(corner_pts, (0, 2, 1))
     K_inv = np.linalg.inv(K)
-    camera_pts = depth * np.transpose((K_inv@corner_pts), (0, 2, 1))
-    camera_pts = np.append(camera_pts, np.array([[[1], [1]], [[1], [1]]]), axis=-1)
-    M = np.vstack((Rt, np.array([0, 0, 0, 1])))
-    M_inv = np.linalg.inv(M)
-    # R_prime = M_inv[:3, :3]
-    # Rt_prime = M_inv[:3, 3]
-    # p = (camera_pts @ R_prime) - Rt_prime
-    # print(p)
-    world_pts = (camera_pts@M_inv)
-    world_pts = world_pts[:, :, :3] / np.expand_dims(world_pts[:, :, 3], axis=2)
-    return world_pts
+    camera_pts = depth * K_inv@corner_pts
+    R_t = Rt[:, :3].T
+    p = np.transpose(R_t @ camera_pts, (0, 2, 1)) - (R_t@np.expand_dims(Rt[:, 3], axis=-1)).T
+    return p
 
 
 def preprocess_ncc_impl(image, ncc_size):
@@ -253,20 +246,15 @@ def preprocess_ncc_impl(image, ncc_size):
     """
     normalized = np.zeros((image.shape[0], image.shape[1], image.shape[2]*ncc_size**2))
     pad = ncc_size // 2
-    # padded_image = np.pad(image,
-    #                       pad_width=((pad, pad), (pad, pad), (0, 0)), mode="constant",
-    #                       constant_values=((0, 0), (0, 0), (0, 0)))
-    count = 0
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
             if i < pad or j < pad or i > image.shape[0]-(pad+1) or j > image.shape[1]-(pad+1):
                 normalized[i, j] = np.zeros(image.shape[2]*ncc_size**2)
             else:
                 patch = image[i-pad:i+pad+1, j-pad:j+pad+1]
-                flat_patch = np.zeros(image.shape[2]*ncc_size**2)
-                flat_patch[:ncc_size**2] = np.ndarray.flatten(patch[:, :, 0]) - np.mean(np.ndarray.flatten(patch[:, :, 0]))
-                flat_patch[ncc_size**2:2*ncc_size**2] = np.ndarray.flatten(patch[:, :, 1]) - np.mean(np.ndarray.flatten(patch[:, :, 1]))
-                flat_patch[2*ncc_size**2:3*ncc_size**2] = np.ndarray.flatten(patch[:, :, 2]) - np.mean(np.ndarray.flatten(patch[:, :, 2]))
+                patch = np.reshape(patch, (patch.shape[0]*patch.shape[1], patch.shape[2]))
+                patch -= np.mean(patch, axis=0)
+                flat_patch = np.ndarray.flatten(patch, order='F')
                 n = np.linalg.norm(flat_patch)
                 if n < 1e-6:
                     normalized[i, j] = np.zeros(image.shape[2]*ncc_size**2)
@@ -287,8 +275,5 @@ def compute_ncc_impl(image1, image2):
         ncc -- height x width normalized cross correlation between image1 and
                image2.
     """
-    ncc = np.zeros((image1.shape[0], image1.shape[1]))
-    for i in range(image1.shape[0]):
-        for j in range(image1.shape[1]):
-            ncc[i, j] = image1[i,j].T @ image2[i,j]
+    ncc = np.sum(image1 * image2, axis=-1)
     return ncc
