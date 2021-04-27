@@ -38,11 +38,17 @@ def compute_photometric_stereo_impl(lights, images):
     I_flat = np.reshape(images, (N, h*w*c))
     G = np.linalg.inv(lights@lights.T)@lights@I_flat
     G = np.reshape(G, (3, h, w, c))
-    ## update this to account for zeros above, this is causing a bug when calculating normals
     albedo = np.linalg.norm(G, axis=0)
+    albedo_norms = np.linalg.norm(albedo, axis=-1)
     normals = np.sum(G, axis=3)
-    normals = normals / np.linalg.norm(normals, axis=0)
     normals = np.transpose(normals, axes=(1, 2, 0))
+    for i in range(normals.shape[0]):
+        for j in range(normals.shape[1]):
+            if albedo_norms[i][j] < 1e-7:
+                albedo[i][j] = np.zeros((1, 3))
+                normals[i][j] = np.zeros((1, 3))
+            else:
+                normals[i][j] = normals[i][j] / np.linalg.norm(normals[i][j])
     return albedo, normals
 
 
