@@ -138,8 +138,10 @@ def project_impl(K, Rt, points):
     """
     ones = np.ones((points.shape[0], points.shape[1], 1))
     world_pts = np.concatenate((points, ones), axis=2)
+    world_pts = np.transpose(world_pts, axes=(0, 2, 1))
     P = K@Rt
-    img_pts = (world_pts @ P.T)[:, :, :2]
+    img_pts = np.transpose((P @ world_pts), axes=(0, 2, 1))
+    img_pts = img_pts[:, :, :2] / img_pts[:, :, 2]
     return img_pts
 
 
