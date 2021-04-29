@@ -141,7 +141,7 @@ def project_impl(K, Rt, points):
     world_pts = np.transpose(world_pts, axes=(0, 2, 1))
     P = K@Rt
     img_pts = np.transpose((P @ world_pts), axes=(0, 2, 1))
-    img_pts = img_pts[:, :, :2] / img_pts[:, :, 2]
+    img_pts = img_pts[:, :, :2] / np.expand_dims(img_pts[:, :, 2], axis=-1)
     return img_pts
 
 
