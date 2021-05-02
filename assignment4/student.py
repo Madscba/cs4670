@@ -22,7 +22,14 @@ class AnimalBaselineNet(nn.Module):
         super(AnimalBaselineNet, self).__init__()
         # TODO: Define layers of model architecture
         # TODO-BLOCK-BEGIN
-
+        #in_channels, out_channels, kernel_size, stride=1, padding=0,
+        in_1, in_2,in_3,out_3= 3,6,12,24
+        fc_out,cls_out = 128,16
+        self.conv1 = torch.nn.Conv2d(in_channels=in_1,out_channels= in_2, kernel_size=3, stride=2, padding=1)
+        self.conv2 = torch.nn.Conv2d(in_channels=in_2,out_channels= in_3, kernel_size=3, stride=2, padding=1)
+        self.conv3 = torch.nn.Conv2d(in_channels=in_3,out_channels= out_3, kernel_size=3, stride=2, padding=1)
+        self.fc = torch.nn.Linear(1536, fc_out)
+        self.cls = torch.nn.Linear(fc_out, cls_out)
         # TODO-BLOCK-END
 
     def forward(self, x):
@@ -30,6 +37,14 @@ class AnimalBaselineNet(nn.Module):
 
         # TODO: Define forward pass
         # TODO-BLOCK-BEGIN
+        x = F.relu(self.conv1(x))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        # print("before",x.size())
+        x = x.view(-1, 24 * 8 * 8)
+        # print("after", x.size())
+        x = F.relu(self.fc(x))
+        x = self.cls(x)
 
         # TODO-BLOCK-END
         return x
@@ -59,12 +74,17 @@ def model_train(net, inputs, labels, criterion, optimizer):
     """
     # TODO: Foward pass
     # TODO-BLOCK-BEGIN
-
+    total_images = inputs.size()[0]
+    pred = net(inputs)
+    running_loss = criterion(pred,labels.squeeze())
+    num_correct = (torch.argmax(pred,1) == labels.squeeze()).float().sum()
     # TODO-BLOCK-END
 
     # TODO: Backward pass
     # TODO-BLOCK-BEGIN
-
+    optimizer.zero_grad()
+    running_loss.backward()
+    optimizer.step()
     # TODO-BLOCK-END
 
     return running_loss, num_correct, total_images
