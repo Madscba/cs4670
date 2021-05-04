@@ -4,6 +4,8 @@
 import numpy as np
 import cv2
 import random
+import scipy
+from scipy import ndimage
 
 import torch
 import torch.nn as nn
@@ -120,6 +122,8 @@ class Shift(object):
         _, H, W = image.shape
         # TODO: Shift image
         # TODO-BLOCK-BEGIN
+        x, y = random.randint(-self.max_shift, self.max_shift), random.randint(-self.max_shift, self.max_shift)
+        image = ndimage.shift(image, (0, x, y))
 
         # TODO-BLOCK-END
 
@@ -161,7 +165,9 @@ class Contrast(object):
 
         # TODO: Change image contrast
         # TODO-BLOCK-BEGIN
-
+        factor = np.random.uniform(self.min_contrast, self.max_contrast)
+        mean = np.full((3, H, W), np.mean(image))
+        image = factor*image + (1-factor)*mean
         # TODO-BLOCK-END
 
         return torch.Tensor(image)
@@ -197,7 +203,8 @@ class Rotate(object):
 
         # TODO: Rotate image
         # TODO-BLOCK-BEGIN
-
+        angle = np.random.uniform(-self.max_angle, self.max_angle)
+        image = ndimage.rotate(image, angle, axes=(1,2), order=1)
         # TODO-BLOCK-END
 
         return torch.Tensor(image)
@@ -230,7 +237,9 @@ class HorizontalFlip(object):
 
         # TODO: Flip image
         # TODO-BLOCK-BEGIN
-
+        if np.random.random_sample() < self.p:
+            image = np.flip(image, axis=2)
+        image = image.copy()
         # TODO-BLOCK-END
 
         return torch.Tensor(image)
